@@ -12,7 +12,8 @@ variables:
 
 
 stages:
- - stage: Validate build
+ - stage: Build
+   displayName: Build, Test & Dockerize
    pool: windows-latest
    jobs:
      - job: Build
