@@ -14,9 +14,10 @@ variables:
 stages:
  - stage: Build
    displayName: Build, Test & Dockerize
-   pool: windows-latest
    jobs:
      - job: Build
+       pool:
+         vmImage: 'windows-latest'
        displayName: Build API
        steps:
         - task: NuGetCommand@2
