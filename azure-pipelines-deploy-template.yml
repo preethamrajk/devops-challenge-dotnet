@@ -1,0 +1,35 @@
+
+
+parameters:
+- name: environment
+  displayName: Environment
+  type: string
+- name: ASPNETCORE_ENVIRONMENT
+  displayName: 
+  type: string
+- name: CONNECTIONSTRINGS__DATABASE
+  displayName: Connection string
+  type: string
+- name: dockerRepo
+  displayName: Docker Repo
+  type: string
+  
+
+jobs:
+- deployment: Deploy_To_${{ parameters.environment }}
+  displayName: 'Deploying to ${{ parameters.environment }}'
+  pool:
+    vmImage: 'ubuntu-latest'
+  environment: ${{ parameters.environment }}
+  strategy:
+    runOnce:
+      deploy:
+        steps:
+        
+        - task: AzureWebAppContainer@1
+          inputs:
+            azureSubscription: 'azuresc'
+            appName: 'btests02'
+            containers: 'kpreethamraj/sales-api:10'
+                          
+        

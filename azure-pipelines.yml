@@ -68,3 +68,12 @@ stages:
           inputs:
             containerRegistry: 'dockerHub'
             command: 'logout'
+
+ - stage: Deploy
+   condition: and(not(failed('Build'))
+   displayName: Deploy to Development
+   jobs:
+    - template: azure-pipelines-deploy-template.yml
+      parameters:
+        CONNECTIONSTRINGS__DATABASE: 'CONNECTIONSTRINGS__DATABASE=Server=dbtests02.database.windows.net;Database=DevOpsChallenge.SalesApi;User=preetham;Password=BunningsTest1234;Trusted_Connection=True;ConnectRetryCount=0'
+        ASPNETCORE_ENVIRONMENT: 'Development'
