@@ -4,7 +4,7 @@ COPY . /app
 WORKDIR /app
 
 RUN ["dotnet", "restore"]
-RUN ["dotnet", "publish", "--configuration", "Debug", "--output", "outdir"]
+RUN ["dotnet", "publish", "--configuration", "Release", "--output", "outdir"]
 
 FROM mcr.microsoft.com/dotnet/aspnet:5.0
 WORKDIR /app

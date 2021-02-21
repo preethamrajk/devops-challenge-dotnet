@@ -1,0 +1,57 @@
+trigger:
+- develop
+- feature/devops #Remove after testing
+
+variables:
+  - name: solution
+    value: '**/*.sln'
+  - name: buildPlatform
+    value: 'Any CPU'  
+  - name: buildConfiguration
+    value: 'Release'
+
+
+stages:
+ - stage: Validate build
+   pool: windows-latest
+   jobs:
+     - job: Build
+       displayName: Build API
+       steps:
+        - task: NuGetCommand@2
+          inputs:
+            command: 'restore'
+            restoreSolution: ($solution)
+            feedsToUse: 'select'
+            
+        - task: DotNetCoreCLI@2
+          inputs:
+            command: 'test'
+            projects: '**/DevOpsChallenge.SalesApi.Business.UnitTests.csproj'
+            testRunTitle: 'Unit tests'
+
+        - task: DotNetCoreCLI@2
+          displayName: Build API
+          inputs:
+            command: 'build'
+            projects: '**/DevOpsChallenge.SalesApi.csproj'
+        
+        - task: Docker@2
+          inputs:
+            containerRegistry: 'dockerRepo'
+            command: 'login'
+
+        - task: Docker@2
+          inputs:
+            containerRegistry: 'dockerRepo'
+            repository: 'sales-api'
+            command: 'buildAndPush'
+            Dockerfile: '**/Dockerfile'
+            tags: |
+              $(Build.BuildId)
+              $(buildFor)
+            
+        - task: Docker@2
+          inputs:
+            containerRegistry: 'dockerRepo'
+            command: 'logout'
