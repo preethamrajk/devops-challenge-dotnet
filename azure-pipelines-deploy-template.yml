@@ -38,9 +38,9 @@ jobs:
         
         - task: AzureWebAppContainer@1
           inputs:
-            azureSubscription: $(azureSubscription)
-            appName: $(webAppName)
-            containers: $(container)
+            azureSubscription: ${{ parameters.azureSubscription }}
+            appName: ${{ parameters.webAppName }}
+            containers: ${{ parameters.container }}
             appSettings: '-PORT 80 -ASPNETCORE_ENVIRONMENT ${{ parameters.ASPNETCORE_ENVIRONMENT}} -CONNECTIONSTRINGS__DATABASE ${{ parameters.CONNECTIONSTRINGS__DATABASE }}'
                           
         
