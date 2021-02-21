@@ -51,8 +51,7 @@ stages:
             Dockerfile: '**/Dockerfile'
             tags: |
               $(Build.BuildId)
-              $(buildFor)
-            
+                          
         - task: Docker@2
           inputs:
             containerRegistry: 'dockerRepo'
