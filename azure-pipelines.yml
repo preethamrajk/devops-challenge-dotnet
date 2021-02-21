@@ -70,7 +70,7 @@ stages:
             command: 'logout'
 
  - stage: Deploy
-   condition: and(not(failed('Build'))
+   condition: not(failed('Build'))
    displayName: Deploy to Development
    jobs:
     - template: azure-pipelines-deploy-template.yml
