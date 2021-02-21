@@ -13,6 +13,16 @@ parameters:
 - name: dockerRepo
   displayName: Docker Repo
   type: string
+- name: container
+  displayName: Container
+  type: string
+- name: webAppName
+  displayName: Web App Name
+  type: string
+- name: azureSubscription
+  displayName: Azure subscription
+  type: string
+
   
 
 jobs:
@@ -28,8 +38,9 @@ jobs:
         
         - task: AzureWebAppContainer@1
           inputs:
-            azureSubscription: 'azuresc'
-            appName: 'btests02'
-            containers: 'kpreethamraj/sales-api:10'
+            azureSubscription: $(azureSubscription)
+            appName: $(webAppName)
+            containers: $(container)
+            appSettings: '-PORT 80 -ASPNETCORE_ENVIRONMENT ${{ parameters.ASPNETCORE_ENVIRONMENT}} -CONNECTIONSTRINGS__DATABASE ${{ parameters.CONNECTIONSTRINGS__DATABASE }}'
                           
         
