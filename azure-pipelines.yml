@@ -22,13 +22,20 @@ stages:
          vmImage: 'ubuntu-latest'
        displayName: Build API
        steps:
+        - task: NuGetToolInstaller@1
+          displayName: Install Nuget Tool
+          inputs:
+              checkLatest: true
+              
         - task: NuGetCommand@2
+          displayName: Nuget Restore
           inputs:
             command: 'restore'
             restoreSolution: $(solution)
             feedsToUse: 'select'
             
         - task: DotNetCoreCLI@2
+          displayName: Unit tests 
           inputs:
             command: 'test'
             projects: '**/DevOpsChallenge.SalesApi.Business.UnitTests.csproj'
@@ -41,11 +48,13 @@ stages:
             projects: '**/DevOpsChallenge.SalesApi.csproj'
         
         - task: Docker@2
+          displayName: Container Registry Login
           inputs:
             containerRegistry: 'dockerHub'
             command: 'login'
 
         - task: Docker@2
+          displayName: Containerize and push to hub
           inputs:
             containerRegistry: 'dockerHub'
             repository: $(dockerRepo)
@@ -55,6 +64,7 @@ stages:
               $(Build.BuildId)
                           
         - task: Docker@2
+          displayName: Container Registry Logout
           inputs:
             containerRegistry: 'dockerHub'
             command: 'logout'
