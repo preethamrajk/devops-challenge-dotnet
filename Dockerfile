@@ -1,15 +1,20 @@
-FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build-env
-
-COPY . /app
+FROM mcr.microsoft.com/dotnet/sdk:5.0 AS build
 WORKDIR /app
 
-RUN ["dotnet", "restore"]
-RUN ["dotnet", "publish", "--configuration", "Release", "--output", "outdir"]
+COPY ["src/DevOpsChallenge.SalesApi/DevOpsChallenge.SalesApi.csproj", "src/DevOpsChallenge.SalesApi/"]
+COPY ["src/DevOpsChallenge.SalesApi.Business/DevOpsChallenge.SalesApi.Business.csproj", "src/DevOpsChallenge.SalesApi.Business/"]
+COPY ["src/DevOpsChallenge.SalesApi.Database/DevOpsChallenge.SalesApi.Database.csproj", "src/DevOpsChallenge.SalesApi.Database/"]
 
-FROM mcr.microsoft.com/dotnet/aspnet:5.0
-WORKDIR /app
+RUN dotnet restore "src/DevOpsChallenge.SalesApi/DevOpsChallenge.SalesApi.csproj"
+
+COPY . .
+RUN dotnet build "src/DevOpsChallenge.SalesApi/DevOpsChallenge.SalesApi.csproj" -c Release -o /app/build
+
+FROM build AS publish
+RUN dotnet publish "src/DevOpsChallenge.SalesApi/DevOpsChallenge.SalesApi.csproj" -c Release -o /app/publish
 
 EXPOSE 80/tcp
-COPY --from=build-env /app/outdir .
+ENV ASPNETCORE_URLS=http://+:80
 
-ENTRYPOINT ["dotnet", "DevOpsChallenge.SalesApi.dll"]
+WORKDIR /app
+ENTRYPOINT ["dotnet","publish/DevOpsChallenge.SalesApi.dll"]
