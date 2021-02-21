@@ -80,5 +80,5 @@ stages:
         environment: 'Development'
         dockerRepo: $(dockerRepo)
         container: 'kpreethamraj/sales-api:$(Build.BuildId)'
-        webAappName: 'btests02'
+        webAppName: 'btests02'
         azureSubscription: 'azuresc'
