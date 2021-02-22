@@ -11,10 +11,19 @@ variables:
     value: 'Release'
   - name: dockerRepo
     value: 'kpreethamraj/sales-api'
-
+  - name: 'salesAPIDEV'
+    value: 'https://btests02.azurewebsites.net/'
+  - name: 'connectionString'
+    value: 'Server=dbtests02.database.windows.net;Database=DevOpsChallenge.SalesApi;User=preetham;Password=BunningsTest1234;ConnectRetryCount=0'
+  - name: 'devWebApp'
+    value: 'btests02'
+  - name: 'regWebApp'
+    value: 'nothingYetHaha'
+  - name: 'azureSub'
+    value: 'azuresc'
 
 stages:
- - stage: Build
+ - stage: BUILD
    displayName: Build, Test & Dockerize
    jobs:
      - job: Build
@@ -69,16 +78,58 @@ stages:
             containerRegistry: 'dockerHub'
             command: 'logout'
 
- - stage: Deploy
-   condition: not(failed('Build'))
+ - stage: DEPLOY_DEVTEST_ENVIRONMENT
+   condition: not(failed('BUILD'))
    displayName: Deploy to Development
    jobs:
     - template: azure-pipelines-deploy-template.yml
       parameters:
-        CONNECTIONSTRINGS__DATABASE: 'Server=dbtests02.database.windows.net;Database=DevOpsChallenge.SalesApi;User=preetham;Password=BunningsTest1234;ConnectRetryCount=0'
+        CONNECTIONSTRINGS__DATABASE: '$(connectionString)'
         ASPNETCORE_ENVIRONMENT: 'Development'
         environment: 'Development'
         dockerRepo: $(dockerRepo)
-        container: 'kpreethamraj/sales-api:$(Build.BuildId)'
-        webAppName: 'btests02'
-        azureSubscription: 'azuresc'
+        container: '$(dockerRepo):$(Build.BuildId)'
+        webAppName: '$(devWebApp)'
+        azureSubscription: '$(azureSub)'
+    
+    - job: Test
+      displayName: 'Integration tests'
+      pool:
+        vmImage: 'ubuntu-latest'
+      steps:
+       - task: NuGetToolInstaller@1
+         displayName: Install Nuget Tool
+         inputs:
+             checkLatest: true
+             
+       - task: NuGetCommand@2
+         displayName: Nuget Restore
+         inputs:
+           command: 'restore'
+           restoreSolution: $(solution)
+           feedsToUse: 'select'
+
+       - task: DotNetCoreCLI@2
+         env:
+           SALES_API_ENDPOINT: $(salesAPIDEV)
+         displayName: Integration tests
+         inputs:
+           command: 'test'
+           projects: '**/DevOpsChallenge.SalesApi.Business.IntegrationTests.csproj'
+           testRunTitle: 'Integration tests'
+
+ #- stage: DEPLOY_REGRESSION_ENVIRONMENT
+ #  condition: not(failed('DEPLOY_DEVTEST_ENVIRONMENT'))
+ #  displayName: Deploy to Development
+ #  jobs:
+ #   - template: azure-pipelines-deploy-template.yml
+ #     parameters:
+ #       CONNECTIONSTRINGS__DATABASE: 'Server=dbtests02.database.windows.net;Database=DevOpsChallenge.SalesApi;User=preetham;Password=BunningsTest1234;ConnectRetryCount=0'
+ #       ASPNETCORE_ENVIRONMENT: 'PRODUCTION'
+ #       environment: 'Regression'
+ #       dockerRepo: $(dockerRepo)
+ #       container: 'kpreethamraj/sales-api:$(Build.BuildId)'
+ #       webAppName: '$(regWebApp)'
+ #       azureSubscription: 'azuresc'
+    
+    
