@@ -7,9 +7,6 @@ parameters:
 - name: ASPNETCORE_ENVIRONMENT
   displayName: 
   type: string
-- name: CONNECTIONSTRINGS__DATABASE
-  displayName: Connection string
-  type: string
 - name: dockerRepo
   displayName: Docker Repo
   type: string
@@ -34,14 +31,29 @@ jobs:
   strategy:
     runOnce:
       deploy:
-        steps:
+        steps:       
+                
+        - task: AzureKeyVault@1
+          inputs:
+            azureSubscription: 'azuresc'
+            KeyVaultName: 'btestskeyvault'
+            SecretsFilter: '*'
+            RunAsPreJob: true
+        
+        - task: PowerShell@2
+          inputs:
+            targetType: 'inline'
+            script: |
+              $v= [Environment]::GetEnvironmentVariable("connectionString_$environment")
+              ("##vso[task.setvariable variable=connectionString;isSecret=true]$v")
+
         
         - task: AzureWebAppContainer@1
           inputs:
             azureSubscription: ${{ parameters.azureSubscription }}
             appName: ${{ parameters.webAppName }}
             containers: ${{ parameters.container }}
-            appSettings: '-PORT 80 -ASPNETCORE_ENVIRONMENT ${{ parameters.ASPNETCORE_ENVIRONMENT}} -CONNECTIONSTRINGS__DATABASE ${{ parameters.CONNECTIONSTRINGS__DATABASE }}'
+            appSettings: '-PORT 80 -ASPNETCORE_ENVIRONMENT ${{ parameters.ASPNETCORE_ENVIRONMENT}} -CONNECTIONSTRINGS__DATABASE $(connectionString)'
                           
         # DB Migrations!
         # This can get tricky in a teams setting. Leaving it for now.

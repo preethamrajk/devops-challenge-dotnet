@@ -13,14 +13,14 @@ variables:
     value: 'kpreethamraj/sales-api'
   - name: 'salesAPIDEV'
     value: 'https://btests02.azurewebsites.net/'
-  - name: 'connectionString'
-    value: 'Server=dbtests02.database.windows.net;Database=DevOpsChallenge.SalesApi;User=preetham;Password=BunningsTest1234;ConnectRetryCount=0'
   - name: 'devWebApp'
     value: 'btests02'
   - name: 'regWebApp'
     value: 'nothingYetHaha'
   - name: 'azureSub'
     value: 'azuresc'
+  - name: 'keyVault'
+    value: 'btestskeyvault'
 
 stages:
  - stage: BUILD
@@ -84,13 +84,13 @@ stages:
    jobs:
     - template: azure-pipelines-deploy-template.yml
       parameters:
-        CONNECTIONSTRINGS__DATABASE: '$(connectionString)'
         ASPNETCORE_ENVIRONMENT: 'Development'
         environment: 'Development'
         dockerRepo: $(dockerRepo)
         container: '$(dockerRepo):$(Build.BuildId)'
         webAppName: '$(devWebApp)'
         azureSubscription: '$(azureSub)'
+        keyVault: '$(keyVault)'
       
     
     - job: INTEGRATION_TESTS
@@ -117,7 +117,7 @@ stages:
          displayName: Integration tests
          inputs:
            command: 'test'
-           projects: '**/DevOpsChallenge.SalesApi.Business.IntegrationTests.csproj'
+           projects: '**/DevOpsChallenge.SalesApi.IntegrationTests.csproj'
            testRunTitle: 'Integration tests'
 
  #- stage: DEPLOY_REGRESSION_ENVIRONMENT
@@ -126,12 +126,13 @@ stages:
  #  jobs:
  #   - template: azure-pipelines-deploy-template.yml
  #     parameters:
- #       CONNECTIONSTRINGS__DATABASE: 'Server=dbtests02.database.windows.net;Database=DevOpsChallenge.SalesApi;User=preetham;Password=BunningsTest1234;ConnectRetryCount=0'
+ #       CONNECTIONSTRINGS__DATABASE: '$(rgrConnectionString)'
  #       ASPNETCORE_ENVIRONMENT: 'PRODUCTION'
  #       environment: 'Regression'
  #       dockerRepo: $(dockerRepo)
  #       container: 'kpreethamraj/sales-api:$(Build.BuildId)'
  #       webAppName: '$(regWebApp)'
  #       azureSubscription: 'azuresc'
+ #       keyVault: '$(keyVault)'
     
     
