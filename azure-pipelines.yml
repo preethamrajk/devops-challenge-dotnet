@@ -80,7 +80,7 @@ stages:
 
  - stage: DEPLOY_DEVTEST_ENVIRONMENT
    condition: not(failed('BUILD'))
-   displayName: Deploy to Development
+   displayName: Deploy to Development and run Integration tests
    jobs:
     - template: azure-pipelines-deploy-template.yml
       parameters:
@@ -91,9 +91,11 @@ stages:
         container: '$(dockerRepo):$(Build.BuildId)'
         webAppName: '$(devWebApp)'
         azureSubscription: '$(azureSub)'
+      
     
-    - job: Test
+    - job: INTEGRATION_TESTS
       displayName: 'Integration tests'
+      dependsOn: Deploy_To_Development
       pool:
         vmImage: 'ubuntu-latest'
       steps:
