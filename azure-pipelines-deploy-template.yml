@@ -41,15 +41,16 @@ jobs:
             azureSubscription: ${{ parameters.azureSubscription }}
             KeyVaultName: ${{ parameters.keyVault }}
             SecretsFilter: '*'
-            RunAsPreJob: true
+            
         
         - task: PowerShell@2
           inputs:
             targetType: 'inline'
             script: |
-              $v= [Environment]::GetEnvironmentVariable("connectionString-$environment:Environment")
-              Write-Host $v
+              $v= [Environment]::GetEnvironmentVariable("connectionString-$environment")
+              Write-Host '1'+$v
               Write-Host ("##vso[task.setvariable variable=connectionString;isSecret=true]$v")
+              Write-Host '2'+$connectionString
 
         
         - task: AzureWebAppContainer@1
