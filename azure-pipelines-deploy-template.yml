@@ -44,8 +44,8 @@ jobs:
           inputs:
             targetType: 'inline'
             script: |
-              $v= [Environment]::GetEnvironmentVariable("connectionString_$environment")
-              ("##vso[task.setvariable variable=connectionString;isSecret=true]$v")
+              $v= [Environment]::GetEnvironmentVariable("connectionString-$environment")
+              Write-Host ("##vso[task.setvariable variable=connectionString;isSecret=true]$v")
 
         
         - task: AzureWebAppContainer@1
