@@ -47,7 +47,7 @@ jobs:
           inputs:
             targetType: 'inline'
             script: |
-              $v= [Environment]::GetEnvironmentVariable("connectionString-${{ parameters.environment }}")
+              $v= $(connectionString-${{ parameters.environment }})
               Write-Host '1'+$v
               Write-Host ("##vso[task.setvariable variable=connectionString;isSecret=true]$v")
               Write-Host '2'+$connectionString
