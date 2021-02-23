@@ -42,23 +42,12 @@ jobs:
             KeyVaultName: ${{ parameters.keyVault }}
             SecretsFilter: '*'
             
-        
-        - task: PowerShell@2
-          inputs:
-            targetType: 'inline'
-            script: |
-              $v= $(connectionString-${{ parameters.environment }})
-              Write-Host '1'+$v
-              Write-Host ("##vso[task.setvariable variable=connectionString;isSecret=true]$v")
-              Write-Host '2'+$connectionString
-
-        
         - task: AzureWebAppContainer@1
           inputs:
             azureSubscription: ${{ parameters.azureSubscription }}
             appName: ${{ parameters.webAppName }}
             containers: ${{ parameters.container }}
-            appSettings: '-PORT 80 -ASPNETCORE_ENVIRONMENT ${{ parameters.ASPNETCORE_ENVIRONMENT}} -CONNECTIONSTRINGS__DATABASE $(connectionString)'
+            appSettings: '-PORT 80 -ASPNETCORE_ENVIRONMENT ${{ parameters.ASPNETCORE_ENVIRONMENT}} -CONNECTIONSTRINGS__DATABASE $(connectionString-${{ parameters.environment }})'
                           
         # DB Migrations!
         # This can get tricky in a teams setting. Leaving it for now.
