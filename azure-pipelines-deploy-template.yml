@@ -38,8 +38,8 @@ jobs:
                 
         - task: AzureKeyVault@1
           inputs:
-            azureSubscription: ${{ parameters.azureSubscription }}'
-            KeyVaultName: ${{ parameters.keyVault }}'
+            azureSubscription: ${{ parameters.azureSubscription }}
+            KeyVaultName: ${{ parameters.keyVault }}
             SecretsFilter: '*'
             RunAsPreJob: true
         
